@@ -26,7 +26,7 @@
 '       RAWデータシートをこのブックにコピーするか、
 '       先にMain_RAWデータ生成を実行してRAWデータを用意する）
 '   ・PPTのP4テーブル列1：法人名、P6テーブル列1：店舗名を事前に入力しておく
-'   ・PPTのP8・P10の「Audi ○○○○」が店舗名のプレースホルダー
+'   ・PPTのP8・P10の「ExampleBrand B ○○○○」が店舗名のプレースホルダー
 '==============================================================================
 
 Option Explicit
@@ -718,8 +718,8 @@ Private Sub UpdateP8_M4(pptPres As Object, sd As Object, shopName As String)
         ' 店舗名プレースホルダーを置換
         If sh.HasTextFrame Then
             Dim txt As String: txt = sh.TextFrame.TextRange.Text
-            If InStr(txt, "Audi ○○○○") > 0 Then
-                sh.TextFrame.TextRange.Text = Replace(txt, "Audi ○○○○", shopName)
+            If InStr(txt, "ExampleBrand B ○○○○") > 0 Then
+                sh.TextFrame.TextRange.Text = Replace(txt, "ExampleBrand B ○○○○", shopName)
             End If
         End If
         ' テーブル内のセルを更新
@@ -779,8 +779,8 @@ Private Sub UpdateP10_M4(pptPres As Object, sd As Object, shopName As String)
         If sh.HasTextFrame Then
             Dim txt As String: txt = sh.TextFrame.TextRange.Text
             ' 店舗名置換
-            If InStr(txt, "Audi ○○○○") > 0 Then
-                sh.TextFrame.TextRange.Text = Replace(txt, "Audi ○○○○", shopName)
+            If InStr(txt, "ExampleBrand B ○○○○") > 0 Then
+                sh.TextFrame.TextRange.Text = Replace(txt, "ExampleBrand B ○○○○", shopName)
             End If
             ' 件数バー更新
             If InStr(txt, "重大エラー発生件数：　　　件") > 0 Then

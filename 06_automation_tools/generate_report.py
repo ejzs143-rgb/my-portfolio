@@ -4,7 +4,7 @@
 ==============================================================
 使い方:
   python generate_report.py                          # 対話モード（GUIダイアログ）
-  python generate_report.py 業務時間_Ishioka.xlsx    # ファイル指定
+  python generate_report.py 業務時間_Analyst.xlsx    # ファイル指定
   python generate_report.py 業務時間.xlsx 2026-02-16 # 期間も指定
 
 出力: 業務報告_承認担当者向け_MMDD.xlsx（スクリプトと同じフォルダ）
@@ -46,22 +46,22 @@ warnings.filterwarnings("ignore")
 # 設定：個人業務リスト（担当者担当固有の業務）
 # ══════════════════════════════════════════════════════════
 PERSONAL_TASKS = {
-    "VW CEM改善",
-    "AUDIクレームチェック",
-    "WGI管理",
+    "BrandA ProgramB改善",
+    "BRANDBクレームチェック",
+    "ProgramA管理",
     "予算実績管理",
     "重点店舗改善",
     "オントレ未受講者撲滅",
     "サプライヤー契約更改",
     "MO+RE情報共有",
-    "BusinessAppユーザー登録",
+    "InternalBusinessAppユーザー登録",
     "販売店業務改善",
     "ワランティマイスターコミッティー",
     "ローカルグッドウィル予算計算",
     "TOEIC学習",
-    "双葉 契約/RFA/SOW",
+    "Sample Vendor 契約/RFA/SOW",
     "オンライントレーニング刷新＆受講促進活動",
-    "WGI MO+RE",
+    "ProgramA MO+RE",
     "コアプロ関係",
     "RFP RFA DASS PO 契約関係",
     "AI関連",
@@ -74,32 +74,32 @@ PERSONAL_TASKS = {
 # 設定：タスク命名辞書（備考のキーワード→タスク名）
 # ══════════════════════════════════════════════════════════
 LABEL_DICT = {
-    "SupportDesk":       "SupportDesk問合せ対応",
-    "双葉":      "双葉 契約/RFA/SOW",
-    "MbO":       "MbO対応",
-    "mbo":       "MbO対応",
-    "MBO":       "MbO対応",
+    "ServiceDesk":       "ServiceDesk問合せ対応",
+    "Sample Vendor":      "Sample Vendor 契約/RFA/SOW",
+    "ObjectiveReview":       "ObjectiveReview対応",
+    "mbo":       "ObjectiveReview対応",
+    "ObjectiveReview":       "ObjectiveReview対応",
     "判ミ":      "判定MTG",
     "課内会議":  "課内会議",
     "FBT":       "FBT定例",
     "KD2":       "KD2 MTG",
     "エラマネ":  "エラー分析MTG",
-    "神戸西":    "神戸西案件",
-    "MSXI":      "MSXI支払管理",
+    "Sample Project":    "Sample Project案件",
+    "VendorC":      "VendorC支払管理",
     "オントレ":  "オンライントレーニング刷新＆受講促進活動",
     "ATP":       "オンライントレーニング刷新＆受講促進活動",
-    "WGI":       "WGI管理",
-    "CEM":       "VW CEM改善",
-    "AUDI":      "AUDIクレームチェック",
-    "Audi":      "AUDIクレームチェック",
+    "ProgramA":       "ProgramA管理",
+    "ProgramB":       "BrandA ProgramB改善",
+    "BRANDB":      "BRANDBクレームチェック",
+    "ExampleBrand B":      "BRANDBクレームチェック",
     "予算":      "予算実績管理",
     "TOEIC":     "TOEIC学習",
-    "クニース":  "クニース/キムラ対応",
-    "キムラ":    "クニース/キムラ対応",
+    "Vendor A":  "Vendor A/Vendor B対応",
+    "Vendor B":    "Vendor A/Vendor B対応",
     "コアプロ":  "コアプロ関係",
-    "城山":      "コアプロ関係",
-    "BusinessApp":      "BusinessAppユーザー登録",
-    "WFTF":      "WFTF書簡",
+    "Sample Project":      "コアプロ関係",
+    "InternalBusinessApp":      "InternalBusinessAppユーザー登録",
+    "InternalNotice":      "InternalNotice書簡",
     "拒絶":      "拒絶対応",
     "DASS":      "DASS対応",
     "StM":       "StM MTG",
@@ -108,7 +108,7 @@ LABEL_DICT = {
     "業務整理":  "業務整理",
     "AI":        "AI関連",
     "水没":      "水没車対応",
-    "書簡":      "WFTF書簡",
+    "書簡":      "InternalNotice書簡",
 }
 SKIP_WORDS = {
     "さん","対応","確認","含む","関係","関連","業務","整理","準備",
@@ -434,7 +434,7 @@ def generate(excel_path, focus_start_str, output_path):
     NOTE = TOT + 2
     ws.row_dimensions[NOTE - 1].height = 6
     MR(ws, NOTE, 2, 7,
-       "🔴 個人業務 = 重点目標（VW CEM・AUDIチェック・WGI等）　　🔵 課内共通 = チームの定常業務\n"
+       "🔴 個人業務 = 重点目標（BrandA ProgramB・BRANDBチェック・ProgramA等）　　🔵 課内共通 = チームの定常業務\n"
        "★ = 全期間と比べてこの期間に突出して増えた業務",
        bold=False, sz=9, fg="595959", bg=COL["note"], h=40, wrap=True)
 

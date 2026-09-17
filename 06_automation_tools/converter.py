@@ -11,7 +11,7 @@ def select_files():
     
     file_paths = filedialog.askopenfilenames(
         title="文字起こし用に変換するM4Aファイルを選択してください",
-        filetypes=[("M4A Audio", "*.m4a"), ("All Files", "*.*")]
+        filetypes=[("M4A ExampleBrand Bo", "*.m4a"), ("All Files", "*.*")]
     )
     return file_paths
 

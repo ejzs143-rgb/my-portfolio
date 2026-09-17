@@ -64,7 +64,7 @@ if __name__ == "__main__":
     file_paths = filedialog.askopenfilenames(
         title="圧縮する音声ファイルを選択してください（複数選択可）",
         filetypes=[
-            ("Audio Files", "*.m4a;*.mp3;*.wav;*.flac;*.aac;*.wma"),
+            ("ExampleBrand Bo Files", "*.m4a;*.mp3;*.wav;*.flac;*.aac;*.wma"),
             ("All Files", "*.*")
         ]
     )

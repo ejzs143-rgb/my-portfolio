@@ -1,12 +1,12 @@
 ﻿"""
-QualityMetrics月次実績 自動更新（Python版・コア処理）
-データ提供者の生データ(Monthlyレポート) → QualityMetrics実績.xlsx working file への転記
+QualityOperationsMetrics月次実績 自動更新（Python版・コア処理）
+data providerの生データ(Monthlyレポート) → QualityOperationsMetrics実績.xlsx working file への転記
 
 設計方針：
 - 列位置はハードコードせずヘッダー文字列検索で特定（構造変更に強くする）
 - 順方向チェック：working file側の行が元データに一致するか（＝③店舗マスタ変更の反映漏れ検知）
 - 逆方向チェック：元データにあってworking file側に行がない＝新規コード追加が必要な可能性
-  （今回、徳島の新コード86010で実際にこのケースを確認したため追加した）
+  （今回、Sample Locationの新コード10001で実際にこのケースを確認したため追加した）
 """
 import argparse
 import sys
@@ -17,14 +17,14 @@ from datetime import date
 
 def default_target_month(today=None):
     """対象月＝当月ではなく「先月」がデフォルト。
-    月初に前月分のレポートを処理する運用のため（0701_QualityMetrics.txt 00:04:50〜と整合）。
+    月初に前月分のレポートを処理する運用のため（0701_QualityOperationsMetrics.txt 00:04:50〜と整合）。
     """
     today = today or date.today()
     return 12 if today.month == 1 else today.month - 1
 
 
 def _check_source_file(path):
-    """データ提供者のMonthlyレポートとして妥当か検証する。(valid, reason)を返す（例外を投げない）。"""
+    """data providerのMonthlyレポートとして妥当か検証する。(valid, reason)を返す（例外を投げない）。"""
     try:
         wb = openpyxl.load_workbook(path, read_only=True)
         sheets = set(wb.sheetnames)
@@ -39,7 +39,7 @@ def _check_source_file(path):
     return False, f"「今月Qチェック状況」シートがありません（実際: {', '.join(sorted(sheets))}）"
 
 
-def _check_working_file(path, target_sheet="QualityMetrics実績"):
+def _check_working_file(path, target_sheet="QualityOperationsMetrics実績"):
     """working fileとして妥当か検証する。(valid, reason)を返す（例外を投げない）。"""
     try:
         wb = openpyxl.load_workbook(path, read_only=True)
@@ -149,7 +149,7 @@ def load_mycheck_dict(src_path, sheet_name="マイチェック状況"):
 
 
 def update_working_file(working_path, dictQ, dictF, dictMy, target_month, output_path,
-                         target_sheet="QualityMetrics実績", code_header="DC", finalcheck_header="最終チェック",
+                         target_sheet="QualityOperationsMetrics実績", code_header="DC", finalcheck_header="最終チェック",
                          mydate_header="直近実施日"):
     wb = openpyxl.load_workbook(working_path)  # 書き込みのためread_only=False
     ws = wb[target_sheet]
@@ -212,38 +212,38 @@ def update_working_file(working_path, dictQ, dictF, dictMy, target_month, output
 
 
 def main():
-    p = argparse.ArgumentParser(description="QualityMetrics月次実績：データ提供者データをworking fileへ転記")
+    p = argparse.ArgumentParser(description="QualityOperationsMetrics月次実績：data providerデータをworking fileへ転記")
     p.add_argument("--source", required=True,
-                    help="データ提供者のMonthlyレポート(xlsx)、またはそれが入ったフォルダのパス")
+                    help="data providerのMonthlyレポート(xlsx)、またはそれが入ったフォルダのパス")
     p.add_argument("--working", required=True,
-                    help="QualityMetrics実績.xlsx（working file）、またはそれが入ったフォルダのパス")
+                    help="QualityOperationsMetrics実績.xlsx（working file）、またはそれが入ったフォルダのパス")
     p.add_argument("--output", required=True, help="出力先パス（working fileを直接上書きしない）")
     p.add_argument("--month", type=int, default=None,
                     help="対象月（1-12）。省略時は「先月」を自動採用")
     args = p.parse_args()
 
     try:
-        source_path = resolve_input(args.source, _check_source_file, "データ提供者のMonthlyレポート")
+        source_path = resolve_input(args.source, _check_source_file, "data providerのMonthlyレポート")
         working_path = resolve_input(args.working, _check_working_file, "working file")
 
         target_month = args.month or default_target_month()
         print(f"対象月: {target_month}月")
-        print(f"データ提供者レポート: {source_path}")
+        print(f"data providerレポート: {source_path}")
         print(f"working file  : {working_path}")
 
         dictQ, dictF = load_qf_dict(source_path)
         dictMy = load_mycheck_dict(source_path)
-        print(f"データ提供者データ件数: Q={len(dictQ)}件 マイチェック={len(dictMy)}件")
+        print(f"data providerデータ件数: Q={len(dictQ)}件 マイチェック={len(dictMy)}件")
 
         result = update_working_file(working_path, dictQ, dictF, dictMy,
                                       target_month=target_month, output_path=args.output)
         print(f"転記件数: {result['updated']}")
         if result["mismatches"]:
-            print(f"【要確認】working fileにあるがデータ提供者データにないコード（③店舗マスタ変更の反映漏れの可能性）:")
+            print(f"【要確認】working fileにあるがdata providerデータにないコード（③店舗マスタ変更の反映漏れの可能性）:")
             for code, name in result["mismatches"]:
                 print(f"  - {code} {name}")
         if result["new_store_candidates"]:
-            print(f"【要確認】データ提供者データにあるがworking fileに行がないコード（新規店舗追加の可能性）:")
+            print(f"【要確認】data providerデータにあるがworking fileに行がないコード（新規店舗追加の可能性）:")
             for code in result["new_store_candidates"]:
                 print(f"  - {code}")
         if not result["mismatches"] and not result["new_store_candidates"]:

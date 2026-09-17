@@ -3,13 +3,13 @@ chcp 65001 > nul
 setlocal
 
 echo ========================================
-echo   QualityMetrics Monthly Update Tool
-echo   (QualityMetrics月次実績 自動更新ツール)
+echo   QualityOperationsMetrics Monthly Update Tool
+echo   (QualityOperationsMetrics月次実績 自動更新ツール)
 echo ========================================
 echo.
 
 set BASEDIR=%~dp0
-set SRC_DIR=%BASEDIR%input_hata
+set SRC_DIR=%BASEDIR%input_data_provider
 set WORK_DIR=%BASEDIR%input_working
 set OUT_DIR=%BASEDIR%output
 
@@ -53,7 +53,7 @@ if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
 echo 入力フォルダの中身を確認しています...
 echo.
 
-set OUT_FILE=%OUT_DIR%\QualityMetrics実績_更新後.xlsx
+set OUT_FILE=%OUT_DIR%\QualityOperationsMetrics実績_更新後.xlsx
 
 python "%BASEDIR%msqp_import.py" --source "%SRC_DIR%" --working "%WORK_DIR%" --output "%OUT_FILE%"
 set PYRESULT=%ERRORLEVEL%

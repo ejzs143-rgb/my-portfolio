@@ -217,7 +217,7 @@ def safe_remove(path: str):
 
 def ffmpeg_trim_audio_best_effort(ffmpeg_path, in_file, start_sec, end_sec, out_file, progress_cb, aac_bitrate="128k"):
     """
-    Audio-only output (.m4a)
+    ExampleBrand Bo-only output (.m4a)
     1) Try stream copy
     2) Fallback to AAC re-encode
     """
@@ -445,7 +445,7 @@ def main():
             return
 
         br = simpledialog.askstring(
-            "Audio Bitrate",
+            "ExampleBrand Bo Bitrate",
             "AAC bitrate for re-encode fallback (e.g. 96k / 128k / 192k)",
             initialvalue="128k"
         )

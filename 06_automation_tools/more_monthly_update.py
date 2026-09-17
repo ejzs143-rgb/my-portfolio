@@ -1,8 +1,8 @@
 ﻿"""
-MORE Partner分析 月次更新スクリプト
+Partner Performance分析 月次更新スクリプト
 =====================================
 使い方:
-  python more_monthly_update.py --vw VW_Partner.xlsx --audi Audi_Partner.xlsx --month 2026/01
+  python more_monthly_update.py --vw BrandA_Partner.xlsx --ExampleBrandB ExampleBrand B_Partner.xlsx --month 2026/01
 
 初回: 新規Excelを生成
 2回目以降: 既存Excelの推移シートに新月列を追加 + ワースト店シート更新
@@ -100,7 +100,7 @@ def write_worst_sheet(ws, data, brand, month):
     dealers = data['dealers']
 
     ws.merge_cells('A1:L1')
-    c = ws.cell(row=1, column=1, value=f'{brand} MORE Partner分析 — {month}（過去12ヶ月ローリング）')
+    c = ws.cell(row=1, column=1, value=f'{brand} Partner Performance分析 — {month}（過去12ヶ月ローリング）')
     c.font = Font(name='Arial', bold=True, size=13, color='2F5496')
 
     ws.merge_cells('A3:L3')
@@ -242,25 +242,25 @@ def write_guide_sheet(ws):
         '→ 8以上 ★★★要指導 / 5以上 ★★要注意 / 3以上 ★注目',
         '', '■ データ期間', 'Partner Excelは過去12ヶ月のローリング（例：12月レポート → 2025年1月〜12月）',
         '', '■ 月次運用',
-        '1. BPからPartner Excel（VW・Audi）をDL',
-        '2. python more_monthly_update.py --vw VW.xlsx --audi Audi.xlsx --month YYYY/MM',
+        '1. BPからPartner Excel（BrandA・ExampleBrand B）をDL',
+        '2. python more_monthly_update.py --vw BrandA.xlsx --ExampleBrandB ExampleBrand B.xlsx --month YYYY/MM',
         '3. ワースト店シートが最新月で上書き、推移シートに新月列が追加される',
     ]):
         ws.cell(row=17 + i, column=1, value=t).font = Font(name='Arial', size=9)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='MORE Partner月次分析')
-    parser.add_argument('--vw', required=True, help='VW Partner Excel path')
-    parser.add_argument('--audi', required=True, help='Audi Partner Excel path')
+    parser = argparse.ArgumentParser(description='Partner Performance月次分析')
+    parser.add_argument('--vw', required=True, help='BrandA Partner Excel path')
+    parser.add_argument('--ExampleBrandB', required=True, help='ExampleBrand B Partner Excel path')
     parser.add_argument('--month', required=True, help='対象月 (例: 2026/01)')
-    parser.add_argument('--output', default='MORE_analysis_system.xlsx', help='出力Excel path')
+    parser.add_argument('--output', default='partner_analysis_system.xlsx', help='出力Excel path')
     args = parser.parse_args()
 
     print(f"=== MORE月次分析: {args.month} ===")
 
-    vw = extract(args.vw, 'VW')
-    audi = extract(args.audi, 'Audi')
+    vw = extract(args.vw, 'BrandA')
+    ExampleBrandB = extract(args.ExampleBrandB, 'ExampleBrand B')
 
     # Save monthly JSON for backup
     json_dir = 'monthly_data'
@@ -269,7 +269,7 @@ def main():
     with open(f'{json_dir}/vw_{month_key}.json', 'w') as f:
         json.dump(vw, f, ensure_ascii=False)
     with open(f'{json_dir}/audi_{month_key}.json', 'w') as f:
-        json.dump(audi, f, ensure_ascii=False)
+        json.dump(ExampleBrandB, f, ensure_ascii=False)
 
     # Load or create workbook
     if os.path.exists(args.output):
@@ -278,14 +278,14 @@ def main():
     else:
         print(f"新規作成: {args.output}")
         wb = Workbook()
-        wb.active.title = 'VW ワースト店'
-        wb.create_sheet('Audi ワースト店')
+        wb.active.title = 'BrandA ワースト店'
+        wb.create_sheet('ExampleBrand B ワースト店')
         wb.create_sheet('月次推移')
         wb.create_sheet('指標解説')
 
     # Update worst sheets (latest month)
-    write_worst_sheet(wb['VW ワースト店'], vw, 'VW', args.month)
-    write_worst_sheet(wb['Audi ワースト店'], audi, 'Audi', args.month)
+    write_worst_sheet(wb['BrandA ワースト店'], vw, 'BrandA', args.month)
+    write_worst_sheet(wb['ExampleBrand B ワースト店'], ExampleBrandB, 'ExampleBrand B', args.month)
 
     # Update transition sheet
     # Initialize headers if new
@@ -294,19 +294,19 @@ def main():
         ws_t.merge_cells('A1:H1')
         ws_t.cell(row=1, column=1, value='月次スコア推移（ワースト20）').font = \
             Font(name='Arial', bold=True, size=13, color='2F5496')
-        ws_t.cell(row=3, column=1, value='VW').font = Font(name='Arial', bold=True, size=11, color='2F5496')
+        ws_t.cell(row=3, column=1, value='BrandA').font = Font(name='Arial', bold=True, size=11, color='2F5496')
         for i, h in enumerate(['順位', 'Partner ID', 'ディーラー名']):
             sc(ws_t, 4, i + 1, h, font=HEADER_FONT, fill=HEADER_FILL,
                align=Alignment(horizontal='center'))
         ws_t.column_dimensions['A'].width = 5
         ws_t.column_dimensions['B'].width = 9
         ws_t.column_dimensions['C'].width = 35
-        ws_t.cell(row=27, column=1, value='Audi').font = Font(name='Arial', bold=True, size=11, color='2F5496')
+        ws_t.cell(row=27, column=1, value='ExampleBrand B').font = Font(name='Arial', bold=True, size=11, color='2F5496')
         for i, h in enumerate(['順位', 'Partner ID', 'ディーラー名']):
             sc(ws_t, 28, i + 1, h, font=HEADER_FONT, fill=HEADER_FILL,
                align=Alignment(horizontal='center'))
 
-    update_transition_sheet(ws_t, vw, audi, args.month)
+    update_transition_sheet(ws_t, vw, ExampleBrandB, args.month)
 
     # Guide sheet (write once)
     ws_g = wb['指標解説']
@@ -315,9 +315,9 @@ def main():
 
     wb.save(args.output)
     print(f"\n完了: {args.output}")
-    print(f"  VW: {len(vw['dealers'])}店 / Audi: {len(audi['dealers'])}店")
-    print(f"  VW Top3: {', '.join(d['name'].split('-')[-1].strip() for d in vw['dealers'][:3])}")
-    print(f"  Audi Top3: {', '.join(d['name'].split('-')[-1].strip() for d in audi['dealers'][:3])}")
+    print(f"  BrandA: {len(vw['dealers'])}店 / ExampleBrand B: {len(ExampleBrandB['dealers'])}店")
+    print(f"  BrandA Top3: {', '.join(d['name'].split('-')[-1].strip() for d in vw['dealers'][:3])}")
+    print(f"  ExampleBrand B Top3: {', '.join(d['name'].split('-')[-1].strip() for d in ExampleBrandB['dealers'][:3])}")
 
 
 if __name__ == '__main__':

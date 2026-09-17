@@ -1,11 +1,11 @@
 ﻿# -*- coding: utf-8 -*-
 """
-ServiceMetrics 月次レポート自動作成ツール
+ServiceOperationsMetrics 月次レポート自動作成ツール
 ================================================
-Example Company / FF課 担当者向け(最終版)
+Example Company / Operations Team 担当者向け(最終版)
 
 ■設計思想
-  前任担当者のお手本ファイルは「特定フォルダに各種Excelが揃っている前提」の
+  previous administratorのお手本ファイルは「特定フォルダに各種Excelが揃っている前提」の
   外部リンク数式で組まれているが、本ツールはその前提を引き継がない。
   Pythonが各ソースファイルから直接値を計算し、数式に依存しない
   「静的な値だけの最終形」を出力する。出力ファイルには他環境のファイルパスを
@@ -15,19 +15,19 @@ Example Company / FF課 担当者向け(最終版)
   実行時に2つのモードを選べる:
     (a) 今ある最新月のシートが未完成なら、そのシートを完成させる(全データ更新)
     (b) 最新月が完成済みなら、次の月のシートを新規作成する
-  ReceptionMetrics(ダイアログレセプション/H列)は、入手済みなら(a)(b)いずれの中でも
+  ReceptionOperationsMetrics(ダイアログレセプション/H列)は、入手済みなら(a)(b)いずれの中でも
   そのまま反映できる(未入手なら空欄のまま出力し、後日同じ「全データ更新」を
-  再実行すれば良い。以前あった「H列だけ追加」専用モードは、ReceptionMetricsを毎回
+  再実行すれば良い。以前あった「H列だけ追加」専用モードは、ReceptionOperationsMetricsを毎回
   入手できる前提になったため廃止した)。
 ■①(基準ファイル)についての重要な原則
-  ①には前任担当者/担当者が継続管理する系譜ファイル(前回の出力)のみを使う。
-  データ提供者から届くファイルを①に使ってはいけない
-  (データ提供者は自分の手元のコピーにMediaCaptureを追記して返送してくるだけで、
-  彼の店舗リスト自体が最新・網羅的である保証がないため。実際にデータ提供者
-  経由のファイルが248店舗しかなく、276店舗版と混同する事故が発生した)。
-  MediaCapture(I・J列)は、データ提供者から届くファイルから⑥で店舗コードを
+  ①にはprevious administrator/担当者が継続管理する系譜ファイル(前回の出力)のみを使う。
+  data providerから届くファイルを①に使ってはいけない
+  (data providerは自分の手元のコピーにMediaCaptureToolを追記して返送してくるだけで、
+  彼の店舗リスト自体が最新・網羅的である保証がないため。実際にdata provider
+  経由のファイルがpartial location listしかなく、all active locations版と混同する事故が発生した)。
+  MediaCaptureTool(I・J列)は、data providerから届くファイルから⑥で店舗コードを
   キーに値だけを取り込み、①の店舗リストにマージする。①のファイル自体は
-  店舗数の基準として常に前任担当者系譜を使い続ける。
+  店舗数の基準として常にprevious administrator系譜を使い続ける。
 
   いずれの場合も:
     - 全シートの外部リンク数式を「保存済みの計算値」に置き換えて静的化する
@@ -37,52 +37,52 @@ Example Company / FF課 担当者向け(最終版)
 
 ■手動が残る部分(構造上避けられないもの)
   1. 各ソースファイルの取得そのもの
-     UsagePortal(GRP/ビッフィー)・LegacyServiceTool・NewServiceTool・QualityMetricsは別システムからの
+     UsageAnalyticsPortal(GRP/ビッフィー)・LegacyServiceTool・NewServiceTool・QualityOperationsMetricsは別システムからの
      エクスポートが必要。ログイン権限・操作はPythonでは代替できない。
-  2. MediaCapture(I・J列)
-     データ提供者がServiceMetricsワークブック自体にMediaCaptureデータを
+  2. MediaCaptureTool(I・J列)
+     data providerがServiceOperationsMetricsワークブック自体にMediaCaptureToolデータを
      入力した状態でメール送付してくる運用。つまり①で選ぶベースファイルに
      最初から入っているのが通常形。⑥のダイアログは、別途「利用率集計」
      ファイルから取り込みたい場合の予備手段(通常は「いいえ」でよい)。
-  3. ReceptionMetrics(H列)
+  3. ReceptionOperationsMetrics(H列)
      次のどちらのファイルでも読める(2026年7月分で数値照合済み)。
-       (a) 「ReceptionMetrics [YYYYMM].xlsx」の「[YYYYMM]DR」シート(B列=店舗コード,
+       (a) 「ReceptionOperationsMetrics [YYYYMM].xlsx」の「[YYYYMM]DR」シート(B列=店舗コード,
            E列='*'列)…従来形式
        (b) 「[YYYYMM]_T_Jisseki_su_sum_2.xlsx」…(a)の元になっている
-           Access出力そのもの。ReceptionMetricsブックへの貼り付け工程が不要になる
+           Access出力そのもの。ReceptionOperationsMetricsブックへの貼り付け工程が不要になる
      いずれも見出し名で列を特定するため、列位置のズレやシート名末尾の
      空白では失敗しない。月初時点では存在せず、翌週月曜に取得可能。
      モード(b)で後から追加する。
 
 ■確定済みのデータソース対応(2026年6月実績で数値照合済み)
-  F列 UsagePortal利用数            = UsagePortal Usage Report(VW+商用車)「# VIN Requests」合算
+  F列 UsageAnalyticsPortal利用数            = UsageAnalyticsPortal Usage Report(BrandA+商用車)「# VIN Requests」合算
   G列 メンテナンステーブル   = LegacyServiceTool「Created MTs Different VINs」
                               + NewServiceTool「MT: Tables created with unique Vins」
-                              ※複数ブランド(VW/商用車/Audi等)を持つ店舗は
+                              ※複数ブランド(BrandA/商用車/ExampleBrand B等)を持つ店舗は
                               全ブランド行を合算する(下記【運用方針】参照)
-  H列 ダイアログレセプション = ReceptionMetrics [YYYYMM].xlsx の '*' 列、または
+  H列 ダイアログレセプション = ReceptionOperationsMetrics [YYYYMM].xlsx の '*' 列、または
                               [YYYYMM]_T_Jisseki_su_sum_2.xlsx(Access出力)の
                               「CHECKOUT_YMDのカウント*」列。両者は同一値。
-                              K列(カウントK)は前任担当者仕様どおり取らない
-  I列 MediaCaptureテク撮影数   = データ提供者がベースファイルに入力済み
-  J列 MediaCaptureアド送信数   = I列と同値(暫定仕様。下記【運用方針】参照)
+                              K列(カウントK)はprevious administrator仕様どおり取らない
+  I列 MediaCaptureToolテク撮影数   = data providerがベースファイルに入力済み
+  J列 MediaCaptureToolアド送信数   = I列と同値(暫定仕様。下記【運用方針】参照)
   K・M列 目標                = 前月(または参照ファイル)から静的値で引き継ぎ
-  L・N列 QualityMetrics実績            = QualityMetrics実績シートの当月列(Q=G〜R, 最終=U〜AF)
-                              ※QualityMetrics実績に存在しない店舗コードは「非計測店舗」
+  L・N列 QualityOperationsMetrics実績            = QualityOperationsMetrics実績シートの当月列(Q=G〜R, 最終=U〜AF)
+                              ※QualityOperationsMetrics実績に存在しない店舗コードは「非計測店舗」
                               として扱う(下記【運用方針】参照)
 
-■運用方針(2026年7月、前任担当者からの個別確認を前提とせず担当者の判断で確定)
-  担当者が単独運用に移行するにあたり、前任担当者の手作業(の再現・都度確認)
+■運用方針(2026年7月、previous administratorからの個別確認を前提とせず担当者の判断で確定)
+  担当者が単独運用に移行するにあたり、previous administratorの手作業(の再現・都度確認)
   に依存しない、独立して説明可能な計算方式を正式な運用ルールとする。
-  前任者(前任担当者)の集計結果との差異は「バグ」ではなく、下記の意図的な
+  前任者(previous administrator)の集計結果との差異は「バグ」ではなく、下記の意図的な
   設計判断による既知の差異として扱う。
 
-  1) G列は全ブランド機械合算(V+N)とする(2026/6実績で+67/276店舗差・0.28%)
-     根拠(2026/7/9 前任担当者本人への確認と法医学的解析で確定):
-     ・生データ(LegacyServiceTool/NewServiceTool)は前任担当者と完全同一(ハッシュ一致を確認済み)。
+  1) G列は全ブランド機械合算(V+N)とする(2026/6実績で+67/all active locations差・0.28%)
+     根拠(2026/7/9 previous administrator本人への確認と法医学的解析で確定):
+     ・生データ(LegacyServiceTool/NewServiceTool)はprevious administratorと完全同一(ハッシュ一致を確認済み)。
        差はデータではなく「集計のやり方」だけから生じている。
-     ・前任担当者の実際の手順(本人証言): NewServiceToolをV/A/Nに手作業で仕分け→
-       Audiを除外→VとNを別々にVLOOKUPで表へ移して合算。「面倒くさい」
+     ・previous administratorの実際の手順(本人証言): NewServiceToolをV/A/Nに手作業で仕分け→
+       ExampleBrand Bを除外→VとNを別々にVLOOKUPで表へ移して合算。「面倒くさい」
        「本当はやりたくない」と本人も認める多段階の手作業。
      ・差異91店舗の逆算分解: ①Vが丸ごと抜けている=37件(H+Nのみで天野
        値と一致) ②NewServiceTool寄与ゼロなのに+1=11件(IFERROR既定値の疑い)
@@ -93,16 +93,16 @@ Example Company / FF課 担当者向け(最終版)
        (監査・引き継ぎ耐性が高い)。よってこちらを正式方式とする。
 
   2) J列(アド送信数)はI列(テク撮影数)と同値のまま運用する
-     根拠: 前任担当者の旧ファイルでも実際にI列と全店舗で完全一致しており
+     根拠: previous administratorの旧ファイルでも実際にI列と全店舗で完全一致しており
      (独自の値が入っていた形跡なし)、現行運用と実質差はない。
 
-  3) QualityMetrics実績に存在しない店舗(2026/6時点で徳島86010のみ)は、
+  3) QualityOperationsMetrics実績に存在しない店舗(2026/6時点でSample Location10001のみ)は、
      前月引き継ぎの静的値をそのまま「非計測店舗の暫定値」として扱う
-     (前任担当者の旧ファイルでも6ヶ月間 L=N=4 のまま更新されておらず、
+     (previous administratorの旧ファイルでも6ヶ月間 L=N=4 のまま更新されておらず、
      実測値ではなく同様の暫定運用だったことを確認済み)。
-     QualityMetrics側で計測対象化されない限り、この店舗の実績は変動しない前提。
+     QualityOperationsMetrics側で計測対象化されない限り、この店舗の実績は変動しない前提。
 
-  ※将来、前任担当者から追加情報(合算方針の公式回答・別データソースの共有)
+  ※将来、previous administratorから追加情報(合算方針の公式回答・別データソースの共有)
   があれば、上記1)を再考する。ただし現行の全ブランド合算方式は、それ単体
   で独立して正当化可能であるため、情報が得られないことは業務停止の理由
   にならない。
@@ -129,9 +129,9 @@ from openpyxl.utils import column_index_from_string, get_column_letter
 # ============================================================
 
 def load_ppso(paths):
-    """UsagePortal Usage Reportから店舗コード別のUsagePortal利用数(単月)を集計する。
+    """UsageAnalyticsPortal Usage Reportから店舗コード別のUsageAnalyticsPortal利用数(単月)を集計する。
     Partner列 "981/V/51020" 形式から5桁コードを抽出し、
-    "# VIN Requests"(G列)を合算する。VW・商用車の2ファイルを渡すと合算される。
+    "# VIN Requests"(G列)を合算する。BrandA・商用車の2ファイルを渡すと合算される。
     """
     rows = {}
     for path in paths:
@@ -205,13 +205,13 @@ def load_maintenance_table(elsapro_path, elsa2go_path):
 
 
 def load_service_cam_from_so_file(path, sheet_name):
-    """データ提供者から届くファイル(ServiceMetricsワークブック形式)の該当月
-    シートから、店舗コード(B列)別にMediaCapture(I・J列)を取り込む。
+    """data providerから届くファイル(ServiceOperationsMetricsワークブック形式)の該当月
+    シートから、店舗コード(B列)別にMediaCaptureTool(I・J列)を取り込む。
 
-    【設計判断】①(店舗リストの基準)には前任担当者/担当者が継続管理する
-    系譜ファイルのみを使い、データ提供者のファイルを①に使うことはしない
-    (データ提供者側の店舗リストが古い可能性があり、店舗数の基準にすべきでは
-    ないため)。MediaCaptureの値だけを店舗コードで拾い、①の店舗リストに
+    【設計判断】①(店舗リストの基準)にはprevious administrator/担当者が継続管理する
+    系譜ファイルのみを使い、data providerのファイルを①に使うことはしない
+    (data provider側の店舗リストが古い可能性があり、店舗数の基準にすべきでは
+    ないため)。MediaCaptureToolの値だけを店舗コードで拾い、①の店舗リストに
     マージする。path未指定・シート無しなら空を返す(=未反映のまま進める)。
     """
     rows = {}
@@ -237,8 +237,8 @@ def load_service_cam_from_so_file(path, sheet_name):
 
 
 def load_service_cam(path, sheet_name):
-    """(旧形式向け)VW_Service_Cam_利用率集計ファイルの指定月シートから
-    撮影数(G列)を取得する。データ提供者から「利用率集計」形式そのものが
+    """(旧形式向け)BrandA_Service_Cam_利用率集計ファイルの指定月シートから
+    撮影数(G列)を取得する。data providerから「利用率集計」形式そのものが
     届いた場合の予備手段。path未指定・シート無しなら空を返す。
     """
     rows = {}
@@ -266,13 +266,13 @@ def _col_letter(base_letter, month):
 
 
 def load_msqp(path, month):
-    """QualityMetrics実績シートから当月のQチェック/最終チェック「実績」を取得する。
+    """QualityOperationsMetrics実績シートから当月のQチェック/最終チェック「実績」を取得する。
     Qチェック実績: G(1月)〜R(12月) / 最終チェック実績: U(1月)〜AF(12月)。
     目標(F・T列)はここでは扱わない(K・M列は前月からの静的引き継ぎのため)。
     """
     rows = {}
     wb = openpyxl.load_workbook(path, data_only=True)
-    ws = wb['QualityMetrics実績']
+    ws = wb['QualityOperationsMetrics実績']
     q_col = _col_letter('G', month)
     f_col = _col_letter('U', month)
     for r in range(6, ws.max_row + 1):
@@ -289,7 +289,7 @@ def load_msqp(path, month):
 
 def _find_sheet(wb, sheet_name):
     """シート名を「前後の空白を無視して」探す。
-    ※前任担当者作成の ReceptionMetrics 202607.xlsx はシート名が「202607DR 」と
+    ※previous administrator作成の ReceptionOperationsMetrics 202607.xlsx はシート名が「202607DR 」と
       末尾に半角スペースが入っていた。完全一致だと見つからず、
       エラーにならないままH列が空で通る(静かな失敗)ため、緩く探す。
     """
@@ -307,7 +307,7 @@ def _dr_header_map(ws, scan_rows=5):
     {'row':見出し行, 'code':店舗コード列, 'value':値列, 'ym':YYYYMM列} を返す。
 
     2形式に共通対応する:
-      (1) ReceptionMetrics [YYYYMM].xlsx の [YYYYMM]DR シート
+      (1) ReceptionOperationsMetrics [YYYYMM].xlsx の [YYYYMM]DR シート
           → 2行目が見出し、B列=DEALER_CODE / E列='*' / G列=YYYYMM
       (2) Access出力 [YYYYMM]_T_Jisseki_su_sum_2.xlsx
           → 1行目が見出し、A列=DEALER_CODE / D列='CHECKOUT_YMDのカウント*'
@@ -337,13 +337,13 @@ def load_dialog_reception(path, sheet_name, expect_yyyymm=None):
     """ダイアログレセプション数(H列の元データ)を店舗コード別に取得する。
 
     受け付けるファイル(どちらを選んでも同じ結果になる):
-      (a) ReceptionMetrics [YYYYMM].xlsx  … 従来どおり。[YYYYMM]DRシートを読む
-      (b) [YYYYMM]_T_Jisseki_su_sum_2.xlsx … ReceptionMetricsの元になっているAccess出力。
-          ReceptionMetricsブックへの貼り付け工程を経ずに直接読める
+      (a) ReceptionOperationsMetrics [YYYYMM].xlsx  … 従来どおり。[YYYYMM]DRシートを読む
+      (b) [YYYYMM]_T_Jisseki_su_sum_2.xlsx … ReceptionOperationsMetricsの元になっているAccess出力。
+          ReceptionOperationsMetricsブックへの貼り付け工程を経ずに直接読める
 
-    取得する値は「CHECKOUT_YMDのカウント*」列(ReceptionMetrics上の '*' 列)。
-    ※前任担当者お手本内の数式
-      =VLOOKUP($B2,'[ReceptionMetrics 202605.xlsx]202605DR'!$B$3:$E$242,4,FALSE)
+    取得する値は「CHECKOUT_YMDのカウント*」列(ReceptionOperationsMetrics上の '*' 列)。
+    ※previous administratorお手本内の数式
+      =VLOOKUP($B2,'[ReceptionOperationsMetrics 202605.xlsx]202605DR'!$B$3:$E$242,4,FALSE)
       と同じ列。K列(D列)は取らない仕様をそのまま踏襲する。
 
     expect_yyyymm('202607'等)を渡すと、対象月が違うファイルを掴んだ場合に
@@ -387,7 +387,7 @@ def load_dialog_reception(path, sheet_name, expect_yyyymm=None):
 
 
 def _check_dialog_reception(config):
-    """ReceptionMetrics / Access出力のどちらでも、当月データが実際に読めるかを検証する。
+    """ReceptionOperationsMetrics / Access出力のどちらでも、当月データが実際に読めるかを検証する。
     シート名の一致ではなく「読めた店舗数」で判定するため、
     シート名末尾の空白や、ファイル形式の違いでは落ちない。
     """
@@ -398,10 +398,10 @@ def _check_dialog_reception(config):
         dr = load_dialog_reception(path, config.get('ro_dr_sheet'),
                                    expect_yyyymm=config.get('write_sheet'))
     except Exception as e:
-        return (f"★ReceptionMetrics: ファイルを開けません({e})", True)
+        return (f"★ReceptionOperationsMetrics: ファイルを開けません({e})", True)
     if dr:
-        return (f"・ReceptionMetrics: {config['write_sheet']}のデータ{len(dr)}店舗 読み取りOK", False)
-    return ("★ReceptionMetrics: 当月データを読み取れません"
+        return (f"・ReceptionOperationsMetrics: {config['write_sheet']}のデータ{len(dr)}店舗 読み取りOK", False)
+    return ("★ReceptionOperationsMetrics: 当月データを読み取れません"
             f"(対象月{config['write_sheet']}のシート/行が見つからない可能性)", True)
 
 
@@ -443,7 +443,7 @@ def freeze_external_formulas(wb, wb_values):
     内部数式(=SUM等、[n]を含まないもの)はここでは触らない。
 
     【なぜ必要か】openpyxlはファイルを読み込んで保存し直すと、数式セルの
-    「キャッシュ済み計算値」を失う。前任担当者お手本には過去月シート含め
+    「キャッシュ済み計算値」を失う。previous administratorお手本には過去月シート含め
     1.4万セル超の外部リンク数式があり、放置すると過去月のH・K・M列等が
     担当者の環境で全て空欄・リンク切れになる(実測で確認済み)。
     そのため保存前に、元ファイルに保存されていた計算値でセルを置き換える。
@@ -466,7 +466,7 @@ def freeze_external_formulas(wb, wb_values):
 
 def find_ttl_row(ws):
     """C列が'TTL'の行番号を返す(無ければNone)。
-    前任担当者お手本はB列空欄・作業用ファイルはB列99999だが、
+    previous administratorお手本はB列空欄・作業用ファイルはB列99999だが、
     C列'TTL'は両ファイル共通のため、これで判定する。"""
     for r in range(2, ws.max_row + 1):
         if ws[f'C{r}'].value == 'TTL':
@@ -499,7 +499,7 @@ def recompute_ttl(ws):
 # ============================================================
 # 3.5 ディーラーマスタ照合(閉店・改称の検知と反映)
 # ============================================================
-# 【経緯】86010(閉店)・86300(改称)のような変化は、放置すると来月以降
+# 【経緯】10001(閉店)・10002(改称)のような変化は、放置すると来月以降
 # 誤ったまま自動継続してしまう。マスタと現在のシートを突合し、
 # 差異が見つかった項目だけを対話的に確認して反映する。
 # 新規追加候補は件数が多くなりやすいため、個別ダイアログにはせず
@@ -507,7 +507,7 @@ def recompute_ttl(ws):
 # ワンアクションだが、新規追加は行データの作成が必要で性質が異なるため)。
 
 def load_dealer_master(path):
-    """VW販売店マスターファイルから、有効な店舗コード→店名のdictを作る。
+    """BrandA販売店マスターファイルから、有効な店舗コード→店名のdictを作る。
     「店舗マスター」(新車店舗コード/専売店舗名)と「サテライトマスター」
     (サテライト拠点コード/サテライト拠点名称)の両シートを結合する。
     シートが無い/形式が違う場合はそのシートだけ無視し、処理は継続する。
@@ -535,7 +535,7 @@ def _normalize_name(name):
     """店名比較用に、ブランド接頭辞や全角/半角スペースの違いを吸収する。"""
     if not name:
         return ''
-    s = str(name).replace('　', ' ').replace('Volkswagen', '').strip()
+    s = str(name).replace('　', ' ').replace('ExampleBrand A', '').strip()
     return re.sub(r'\s+', '', s)
 
 
@@ -543,10 +543,10 @@ def reconcile_dealer_master(ws, master):
     """シートの店舗コード(B列)・店名(C列)をマスタと突合する。
     閉店候補は1件ずつダイアログで確認して削除を反映する。
     改称候補・新規追加候補は反映せず一覧としてレポートに残す(別途手動対応)。
-    ※改称候補を個別ダイアログにしなかった理由: ServiceMetricsは
-    「Volkswagen北見」のような略称、マスタは「Volkswagen（旭川）北見認定
+    ※改称候補を個別ダイアログにしなかった理由: ServiceOperationsMetricsは
+    「ExampleBrand ASample Location」のような略称、マスタは「ExampleBrand A（Sample Region）Sample Location認定
     中古車センター」のような正式名称、という慣習差が大量にあり(検証時に
-    276店舗中21件が該当)、個別確認では実質ノイズになる。店名の一致判定は
+    all active locations中21件が該当)、個別確認では実質ノイズになる。店名の一致判定は
     人が一覧を見て判断する方が確実。
 
     戻り値: {'閉店として削除': [...], '店名差分(未反映・要確認)': [...],
@@ -606,11 +606,11 @@ def reconcile_dealer_master(ws, master):
     return result
 
 def build_month_sheet(config):
-    """configに従いServiceMetricsワークブックを更新し、レポートdictを返す。
+    """configに従いServiceOperationsMetricsワークブックを更新し、レポートdictを返す。
 
     モード:
       overwrite_existing=True, h_only=False : 既存シートを全データ更新
-      overwrite_existing=True, h_only=True  : 既存シートにH列(ReceptionMetrics)だけ追加
+      overwrite_existing=True, h_only=True  : 既存シートにH列(ReceptionOperationsMetrics)だけ追加
       overwrite_existing=False              : template_sheetをコピーして新月シート作成
 
     共通処理:
@@ -664,7 +664,7 @@ def build_month_sheet(config):
         dr = load_dialog_reception(config.get('ro_dr_path'), config.get('ro_dr_sheet'),
                                    expect_yyyymm=config.get('write_sheet'))
         if not dr:
-            raise ValueError('ReceptionMetricsファイルからデータを読み取れませんでした。'
+            raise ValueError('ReceptionOperationsMetricsファイルからデータを読み取れませんでした。'
                              'ファイルとシート名([YYYYMM]DR)を確認してください。')
         for r in range(2, ws_new.max_row + 1):
             code = ws_new[f'B{r}'].value
@@ -679,10 +679,10 @@ def build_month_sheet(config):
     else:
         ppso = load_ppso(config['ppso_paths'])
         mt = load_maintenance_table(config['elsapro_path'], config['elsa2go_path'])
-        # MediaCaptureは、データ提供者から届くServiceMetrics形式ファイル(新方式)を
+        # MediaCaptureToolは、data providerから届くServiceOperationsMetrics形式ファイル(新方式)を
         # 優先する。無ければ「利用率集計」形式(旧方式)を試す。
         cam_so = load_service_cam_from_so_file(
-            config.get('haga_file_path'), config.get('haga_file_sheet'))
+            config.get('data_provider_file_path'), config.get('data_provider_file_sheet'))
         cam_legacy = load_service_cam(
             config.get('service_cam_path'), config.get('service_cam_sheet'))
         msqp = load_msqp(config['msqp_path'], config['write_month_num'])
@@ -701,7 +701,7 @@ def build_month_sheet(config):
             # F・G・L・Nは必須ソースから毎回網羅取得するため、常にクリアして埋め直す
             for col in ('F', 'G', 'L', 'N'):
                 ws_new[f'{col}{r}'] = None
-            # H・I・J(ReceptionMetrics/MediaCapture)は、既存シート更新時は今回データが
+            # H・I・J(ReceptionOperationsMetrics/MediaCaptureTool)は、既存シート更新時は今回データが
             # 無ければ既存値(前回投入分等)を保持。新規シート作成時のみ
             # 前月由来の値をクリアする。
             if not overwrite:
@@ -725,7 +725,7 @@ def build_month_sheet(config):
                 matched['I_J'] += 1
             elif code in cam_legacy:
                 ws_new[f'I{r}'] = cam_legacy[code]
-                ws_new[f'J{r}'] = cam_legacy[code]  # 暫定:I列と同値(仕様か否か前任担当者に確認中)
+                ws_new[f'J{r}'] = cam_legacy[code]  # 暫定:I列と同値(仕様か否かprevious administratorに確認中)
                 matched['I_J'] += 1
             if code in msqp:
                 mrow = msqp[code]
@@ -770,11 +770,11 @@ def build_month_sheet(config):
         'ディーラーマスタ照合結果': dealer_master_report,
         '★既知の注意事項(毎回表示)': [
             'G列は全ブランド機械合算(V+N)方式=正式運用(docstring【運用方針】参照)。'
-            '前任担当者旧方式(手作業VLOOKUP)との差は手作業ミス由来と確認済み'
-            '(2026/6実績: 91/276店舗差, 合計+67=0.28%)',
-            '86010(徳島)は2026年6月末閉店・86300が7/1付で「VW徳島」に改称。'
-            '7月分作成時に86010の行削除と86300の店名更新を行うこと'
-            '(86010はマスタにコードが残存しているため自動検知されない)',
+            'previous administrator旧方式(手作業VLOOKUP)との差は手作業ミス由来と確認済み'
+            '(2026/6実績: 91/all active locations差, 合計+67=0.28%)',
+            '10001(Sample Location)は2026年6月末閉店・10002が7/1付で「BrandASample Location」に改称。'
+            '7月分作成時に10001の行削除と10002の店名更新を行うこと'
+            '(10001はマスタにコードが残存しているため自動検知されない)',
         ],
     }
 
@@ -855,21 +855,21 @@ def validate_month_consistency(config):
             mismatch = mismatch or res[1]
         return lines, mismatch
 
-    labels = ['UsagePortal(VW)', 'UsagePortal(商用車)']
+    labels = ['UsageAnalyticsPortal(BrandA)', 'UsageAnalyticsPortal(商用車)']
     for i, p in enumerate(config.get('ppso_paths') or []):
-        add(labels[i] if i < 2 else f'UsagePortal{i+1}', _yyyymm_from_filename(p))
+        add(labels[i] if i < 2 else f'UsageAnalyticsPortal{i+1}', _yyyymm_from_filename(p))
     add('LegacyServiceTool', _month_of_elsapro(config['elsapro_path']))
     add('NewServiceTool', _month_of_elsa2go(config['elsa2go_path']))
 
-    # QualityMetricsは年間累積ファイルのため、当月実績列にデータがあるかで判定する
+    # QualityOperationsMetricsは年間累積ファイルのため、当月実績列にデータがあるかで判定する
     msqp = load_msqp(config['msqp_path'], config['write_month_num'])
     n_actual = sum(1 for v in msqp.values()
                    if isinstance(v['q_actual'], (int, float))
                    or isinstance(v['final_actual'], (int, float)))
     if n_actual > 0:
-        lines.append(f"・QualityMetrics実績: {config['write_month_num']}月の実績あり({n_actual}店舗) 一致")
+        lines.append(f"・QualityOperationsMetrics実績: {config['write_month_num']}月の実績あり({n_actual}店舗) 一致")
     else:
-        lines.append(f"★QualityMetrics実績: {config['write_month_num']}月の実績が0件(古いファイルの可能性)")
+        lines.append(f"★QualityOperationsMetrics実績: {config['write_month_num']}月の実績が0件(古いファイルの可能性)")
         mismatch = True
 
     res = _check_dialog_reception(config)
@@ -888,13 +888,13 @@ _XLSX_TYPES = [('Excelファイル', '*.xlsx'), ('すべてのファイル', '*.
 
 
 # ------------------------------------------------------------
-# 「前回使った正しいファイル」の記憶(248店舗版への後戻り防止)
+# 「前回使った正しいファイル」の記憶(partial location list版への後戻り防止)
 # ------------------------------------------------------------
-# 【経緯】276店舗版(前任担当者最終版)と248店舗版(古い作業用ファイル)を
+# 【経緯】all active locations版(previous administrator最終版)とpartial location list版(古い作業用ファイル)を
 # 取り違える事故が3回続いた。都度①でファイルを選び直す限り、いつでも
-# 古い方を誤って選び得る。そこで、店舗数チェックに合格した(=270店舗以上の)
+# 古い方を誤って選び得る。そこで、店舗数チェックに合格した(=minimum expected locations以上の)
 # 出力ファイルのパスを記憶しておき、次回起動時に「前回のファイルを続けて
-# 使うか」を最初に聞く。「はい」を選び続ける限り、276店舗の系譜が
+# 使うか」を最初に聞く。「はい」を選び続ける限り、all active locationsの系譜が
 # そのまま毎月引き継がれ、古いファイルを選ぶ機会自体が減る。
 
 def _state_file_path():
@@ -905,7 +905,7 @@ def _state_file_path():
     (%LOCALAPPDATA%が無い環境ではスクリプトのフォルダにフォールバックする)
     """
     base = os.getenv('LOCALAPPDATA') or os.path.dirname(os.path.abspath(__file__))
-    folder = os.path.join(base, 'ServiceMetricsTool')
+    folder = os.path.join(base, 'ServiceOperationsMetricsTool')
     try:
         os.makedirs(folder, exist_ok=True)
     except Exception:
@@ -1029,9 +1029,9 @@ def pick_files_interactively():
     root = tk.Tk()
     root.withdraw()
 
-    # ① ベースとなるServiceMetricsワークブック
+    # ① ベースとなるServiceOperationsMetricsワークブック
     # 前回、店舗数チェックに合格したファイルがあれば、まずそれを
-    # 続けて使うか聞く(古い248店舗版へ後戻りする事故を防ぐため)。
+    # 続けて使うか聞く(古いpartial location list版へ後戻りする事故を防ぐため)。
     base_path = None
     last_good = _load_last_good_file()
     if last_good:
@@ -1044,12 +1044,12 @@ def pick_files_interactively():
             base_path = last_good
     if base_path is None:
         base_path = _pick_file_checked(
-            '①ServiceMetricsワークブックを選択'
-            '(前回の出力・前任担当者の系譜ファイル等。データ提供者から届いた'
-            'ファイルは選ばないこと。MediaCaptureは⑥で別途取り込みます)',
+            '①ServiceOperationsMetricsワークブックを選択'
+            '(前回の出力・previous administratorの系譜ファイル等。data providerから届いた'
+            'ファイルは選ばないこと。MediaCaptureToolは⑥で別途取り込みます)',
             _XLSX_TYPES)
     if not base_path:
-        messagebox.showerror('中断', 'ServiceMetricsワークブックが未選択のため中断します。')
+        messagebox.showerror('中断', 'ServiceOperationsMetricsワークブックが未選択のため中断します。')
         return None
 
     month_sheets = _month_sheets_of(base_path)
@@ -1061,7 +1061,7 @@ def pick_files_interactively():
     # ①選択直後に店舗数を確認する。ここで気づければ、残り7つの
     # ファイル選択を無駄にすることなく、早い段階でやり直せる。
     # (誰から届いたファイルか、ではなく中身の店舗数だけで判定する。
-    #  データ提供者はMediaCapture分を追記するだけなので、彼が最後に触った
+    #  data providerはMediaCaptureTool分を追記するだけなので、彼が最後に触った
     #  ファイル=全店舗分とは限らない。中身を都度確認するのが確実)
     try:
         _wb0 = openpyxl.load_workbook(base_path, read_only=True)
@@ -1075,8 +1075,8 @@ def pick_files_interactively():
         if not messagebox.askyesno(
                 '①の店舗数が少なめです',
                 f'選んだファイルの{latest_sheet}シートは{_cnt0}店舗分しかありません\n'
-                '(全店舗版は276店舗程度のはずです)。\n\n'
-                '一部の店舗しか無いファイル(例: MediaCapture更新用に抜粋した'
+                '(全店舗版はall active locations程度のはずです)。\n\n'
+                '一部の店舗しか無いファイル(例: MediaCaptureTool更新用に抜粋した'
                 'もの等)を選んでいないか確認してください。\n\n'
                 'このまま続行しますか?(残り7つの選択が無駄になるより、\n'
                 '今ここでファイルを選び直すことを推奨します)'):
@@ -1095,9 +1095,9 @@ def pick_files_interactively():
     if overwrite_existing:
         write_sheet = latest_sheet
         targets_sheet_default = _month_before(latest_sheet)
-        # ※以前はここで「H列だけ追加」モードを選ばせていたが、ReceptionMetricsは
+        # ※以前はここで「H列だけ追加」モードを選ばせていたが、ReceptionOperationsMetricsは
         # 今後毎回入手できる前提のため、常に全データ更新にして質問を廃止した。
-        # ReceptionMetricsは後段⑧で他の任意ファイルと同じ扱いで選択する。
+        # ReceptionOperationsMetricsは後段⑧で他の任意ファイルと同じ扱いで選択する。
     else:
         write_sheet = _month_after(latest_sheet)
         template_sheet = latest_sheet
@@ -1137,68 +1137,68 @@ def pick_files_interactively():
         'elsa2go_path': None,
         'service_cam_path': None,
         'service_cam_sheet': None,
-        'haga_file_path': None,
-        'haga_file_sheet': None,
+        'data_provider_file_path': None,
+        'data_provider_file_sheet': None,
         'msqp_path': None,
         'ro_dr_path': None,
         'ro_dr_sheet': None,
     }
 
-    # ② UsagePortal(VW) ③ UsagePortal(商用車)
-    ppso_vw = _pick_file_checked('②UsagePortal Usage Report(VW用)を選択', _XLSX_TYPES)
+    # ② UsageAnalyticsPortal(BrandA) ③ UsageAnalyticsPortal(商用車)
+    ppso_vw = _pick_file_checked('②UsageAnalyticsPortal Usage Report(BrandA用)を選択', _XLSX_TYPES)
     if not ppso_vw:
-        messagebox.showerror('中断', 'UsagePortal(VW)が未選択のため中断します。')
+        messagebox.showerror('中断', 'UsageAnalyticsPortal(BrandA)が未選択のため中断します。')
         return None
-    ppso_cv = _pick_file_checked('③UsagePortal Usage Report(商用車用)を選択', _XLSX_TYPES)
+    ppso_cv = _pick_file_checked('③UsageAnalyticsPortal Usage Report(商用車用)を選択', _XLSX_TYPES)
     if not ppso_cv:
-        messagebox.showerror('中断', 'UsagePortal(商用車)が未選択のため中断します。')
+        messagebox.showerror('中断', 'UsageAnalyticsPortal(商用車)が未選択のため中断します。')
         return None
     config['ppso_paths'] = [ppso_vw, ppso_cv]
 
     # ④ LegacyServiceTool ⑤ NewServiceTool
-    elsapro = _pick_file_checked('④LegacyServiceTool Maintenance Tablesを選択', _XLSX_TYPES)
-    if not elsapro:
+    LegacyServiceTool = _pick_file_checked('④LegacyServiceTool Maintenance Tablesを選択', _XLSX_TYPES)
+    if not LegacyServiceTool:
         messagebox.showerror('中断', 'LegacyServiceToolファイルが未選択のため中断します。')
         return None
-    elsa2go = _pick_file_checked('⑤NewServiceToolReport(CSV)を選択', _CSV_TYPES)
-    if not elsa2go:
+    NewServiceTool = _pick_file_checked('⑤NewServiceToolReport(CSV)を選択', _CSV_TYPES)
+    if not NewServiceTool:
         messagebox.showerror('中断', 'NewServiceToolReportが未選択のため中断します。')
         return None
-    config['elsapro_path'] = elsapro
-    config['elsa2go_path'] = elsa2go
+    config['elsapro_path'] = LegacyServiceTool
+    config['elsa2go_path'] = NewServiceTool
 
-    # ⑥ MediaCapture: ①にはデータ提供者のファイルを使わない(店舗リストの基準は
-    # 前任担当者/担当者の系譜ファイルに統一する)。そのため、MediaCaptureの
-    # 値だけはデータ提供者から届く別ファイルから、店舗コードで都度取り込む。
+    # ⑥ MediaCaptureTool: ①にはdata providerのファイルを使わない(店舗リストの基準は
+    # previous administrator/担当者の系譜ファイルに統一する)。そのため、MediaCaptureToolの
+    # 値だけはdata providerから届く別ファイルから、店舗コードで都度取り込む。
     if messagebox.askyesno(
-            'MediaCapture(データ提供者のファイル)',
-            'MediaCaptureデータ(I・J列)を、データ提供者から届いた\n'
+            'MediaCaptureTool(data providerのファイル)',
+            'MediaCaptureToolデータ(I・J列)を、data providerから届いた\n'
             'ファイルから取り込みますか?\n\n'
             '(①には使わず、ここで選ぶファイルから店舗コードで\n'
             '該当する値だけを取り込みます。①の店舗リストが基準のまま\n'
             '変わることはありません)'):
-        haga_path = _pick_file_checked('⑥データ提供者から届いたファイルを選択', _XLSX_TYPES)
-        if haga_path:
-            config['haga_file_path'] = haga_path
-            config['haga_file_sheet'] = write_sheet
+        data_provider_path = _pick_file_checked('⑥data providerから届いたファイルを選択', _XLSX_TYPES)
+        if data_provider_path:
+            config['data_provider_file_path'] = data_provider_path
+            config['data_provider_file_sheet'] = write_sheet
 
-    # ⑦ QualityMetrics実績
-    msqp = _pick_file_checked('⑦QualityMetrics実績を選択', _XLSX_TYPES)
+    # ⑦ QualityOperationsMetrics実績
+    msqp = _pick_file_checked('⑦QualityOperationsMetrics実績を選択', _XLSX_TYPES)
     if not msqp:
-        messagebox.showerror('中断', 'QualityMetrics実績が未選択のため中断します。')
+        messagebox.showerror('中断', 'QualityOperationsMetrics実績が未選択のため中断します。')
         return None
     config['msqp_path'] = msqp
 
-    # ⑧ ReceptionMetrics(任意。月初時点でまだ入手できていない場合は「いいえ」でよい)
+    # ⑧ ReceptionOperationsMetrics(任意。月初時点でまだ入手できていない場合は「いいえ」でよい)
     if messagebox.askyesno(
             'ダイアログレセプション',
             'H列(ダイアログレセプション)の元データは入手済みですか?\n\n'
             '次のどちらでも構いません:\n'
-            f'  ・ReceptionMetrics {write_sheet}.xlsx (従来)\n'
+            f'  ・ReceptionOperationsMetrics {write_sheet}.xlsx (従来)\n'
             f'  ・{write_sheet}_T_Jisseki_su_sum_2.xlsx (Access出力・直読)\n\n'
-            'Access出力を選べば、ReceptionMetricsブックへの貼り付けは不要です。'):
+            'Access出力を選べば、ReceptionOperationsMetricsブックへの貼り付けは不要です。'):
         ro_dr_path = _pick_file_checked(
-            f'⑧ReceptionMetrics {write_sheet}.xlsx または {write_sheet}_T_Jisseki_su_sum_2.xlsx を選択',
+            f'⑧ReceptionOperationsMetrics {write_sheet}.xlsx または {write_sheet}_T_Jisseki_su_sum_2.xlsx を選択',
             _XLSX_TYPES)
         if ro_dr_path:
             config['ro_dr_path'] = ro_dr_path
@@ -1227,7 +1227,7 @@ def pick_files_interactively():
                 '目標値(K・M列)の確認',
                 f'①のファイルの {targets_sheet_default} シートに目標値(K・M列)が'
                 f'ほとんど見つかりません(検出: {len(targets)}店舗)。\n\n'
-                '目標値が入った別ファイル(例: 前任担当者の完成版)から'
+                '目標値が入った別ファイル(例: previous administratorの完成版)から'
                 '取り込みますか?\n(「いいえ」の場合、K・M列は空欄になります)'):
             ref_path = _pick_file_checked('目標値の参照ファイルを選択', _XLSX_TYPES)
             if ref_path:
@@ -1254,7 +1254,7 @@ def pick_files_interactively():
     # 実行前の最終確認(月整合チェック+店舗数チェック)。
     # 書き込み先シートとソースの月が食い違うと誤った月に数字が入るため、
     # 実行前に必ず照合結果を表示し、不整合があれば中断を推奨する。
-    # 店舗数も表示する(過去に248店舗版と276店舗版を取り違える事故が
+    # 店舗数も表示する(過去にpartial location list版とall active locations版を取り違える事故が
     # 複数回発生したため、実行前に気づけるようにする)。
     try:
         check_lines, has_mismatch = validate_month_consistency(config)
@@ -1280,8 +1280,8 @@ def pick_files_interactively():
                f'①ファイルの対象店舗数: {dealer_count}店舗\n\n'
                f'[ソースの対象月チェック]\n' + '\n'.join(check_lines))
     if dealer_count is not None and dealer_count < 270:
-        summary += (f'\n\n★店舗数が{dealer_count}件と少なめです。276店舗版と'
-                    '248店舗版を取り違えていないか確認してください。')
+        summary += (f'\n\n★店舗数が{dealer_count}件と少なめです。all active locations版と'
+                    'partial location list版を取り違えていないか確認してください。')
         has_mismatch = True
     if has_mismatch:
         summary += ('\n\n★警告があります。このまま実行すると想定と違う\n'
@@ -1298,7 +1298,7 @@ def pick_files_interactively():
     output_path = filedialog.asksaveasfilename(
         title='⑨保存先を指定',
         defaultextension='.xlsx',
-        initialfile=f'ServiceMetrics_{write_sheet}.xlsx',
+        initialfile=f'ServiceOperationsMetrics_{write_sheet}.xlsx',
         filetypes=_XLSX_TYPES)
     if not output_path:
         messagebox.showerror('中断', '保存先が未指定のため中断します。')
@@ -1317,15 +1317,15 @@ def pick_files_interactively():
 
 
 # ============================================================
-# ReceptionMetricsブック生成(Access出力 → ReceptionMetrics [YYYYMM].xlsx へ当月シートを追加)
+# ReceptionOperationsMetricsブック生成(Access出力 → ReceptionOperationsMetrics [YYYYMM].xlsx へ当月シートを追加)
 # ------------------------------------------------------------
-# ServiceMetricsのH列はAccess出力を直読できるようになったため、
-# この機能は「ReceptionMetricsブック自体を参照している人が他にいる場合」に
+# ServiceOperationsMetricsのH列はAccess出力を直読できるようになったため、
+# この機能は「ReceptionOperationsMetricsブック自体を参照している人が他にいる場合」に
 # 従来どおりのブックを維持するためのもの。
 # 貼り付け位置・見出し・列順は202601〜202607の実物と同一形式で書き出す。
 # ============================================================
 
-# 書き出し先の固定レイアウト(実物のReceptionMetrics 202601〜202607と一致)
+# 書き出し先の固定レイアウト(実物のReceptionOperationsMetrics 202601〜202607と一致)
 _DR_LAYOUT = {
     'start_col': 2,          # B列から
     'header_row': 2,
@@ -1357,7 +1357,7 @@ _RO_LAYOUT = {
         '数値以外のカウント': ['数値以外のカウント'],
         'YYYYMM': ['YYYYMM'],
     },
-    # 1行目の手書き見出し(前任担当者が付けていたもの)。列は書き出し後の位置で指定
+    # 1行目の手書き見出し(previous administratorが付けていたもの)。列は書き出し後の位置で指定
     'notes': {'CHECKOUT_YMDのカウント': 'リペアオペレーション（分母）',
               '数値のカウント': 'リペアオペレーション（分子）'},
 }
@@ -1384,7 +1384,7 @@ def _read_access_export(path):
 
 
 def write_ro_dr_sheet(wb, sheet_name, layout, src_path, yyyymm):
-    """Access出力1本から、ReceptionMetricsブックへシート1枚を書き出す。
+    """Access出力1本から、ReceptionOperationsMetricsブックへシート1枚を書き出す。
     見出し名で対応付けるため、Access側の列順が入れ替わっても正しく並ぶ。
     """
     headers, rows = _read_access_export(src_path)
@@ -1435,9 +1435,9 @@ def write_ro_dr_sheet(wb, sheet_name, layout, src_path, yyyymm):
 
 
 def run_ro_dr_builder():
-    """ReceptionMetricsブックに当月のDR/ROシートを追加するモード。"""
+    """ReceptionOperationsMetricsブックに当月のDR/ROシートを追加するモード。"""
     book = _pick_file_checked(
-        '①ベースにするReceptionMetricsブック(ReceptionMetrics [前月].xlsx)を選択', _XLSX_TYPES)
+        '①ベースにするReceptionOperationsMetricsブック(ReceptionOperationsMetrics [前月].xlsx)を選択', _XLSX_TYPES)
     if not book:
         return
     wb = openpyxl.load_workbook(book)
@@ -1468,7 +1468,7 @@ def run_ro_dr_builder():
             'ROシートも作成しますか?\n\n'
             '「はい」の場合、ROシートの元データ\n'
             f'({yyyymm}_T_Jisseki_su_sum_K_all.xlsx 相当)を次に選択します。\n\n'
-            '※ServiceMetricsのH列はDRシートしか使いません。\n'
+            '※ServiceOperationsMetricsのH列はDRシートしか使いません。\n'
             '　ROシートを他で参照している人がいなければ「いいえ」で構いません。'):
         ro_src = _pick_file_checked('③ROシートの元データを選択', _XLSX_TYPES)
 
@@ -1481,7 +1481,7 @@ def run_ro_dr_builder():
 
     out = filedialog.asksaveasfilename(
         title='保存先を指定', defaultextension='.xlsx',
-        initialfile=f'ReceptionMetrics {yyyymm}.xlsx', filetypes=_XLSX_TYPES)
+        initialfile=f'ReceptionOperationsMetrics {yyyymm}.xlsx', filetypes=_XLSX_TYPES)
     if not out:
         return
     try:
@@ -1501,14 +1501,14 @@ def run_ro_dr_builder():
 
 
 def main():
-    # 起動時にモードを選ぶ。通常はServiceMetrics作成。
+    # 起動時にモードを選ぶ。通常はServiceOperationsMetrics作成。
     if messagebox.askyesno(
             'モード選択',
-            'ReceptionMetricsブックに当月シート(DR/RO)を追加しますか?\n\n'
-            '「はい」 → ReceptionMetricsブック作成モード\n'
-            '「いいえ」→ ServiceMetrics作成(通常)\n\n'
-            '※ServiceMetricsのH列はAccess出力を直読できるため、\n'
-            '　ReceptionMetricsブックは他の参照者がいる場合のみ維持すれば足ります。'):
+            'ReceptionOperationsMetricsブックに当月シート(DR/RO)を追加しますか?\n\n'
+            '「はい」 → ReceptionOperationsMetricsブック作成モード\n'
+            '「いいえ」→ ServiceOperationsMetrics作成(通常)\n\n'
+            '※ServiceOperationsMetricsのH列はAccess出力を直読できるため、\n'
+            '　ReceptionOperationsMetricsブックは他の参照者がいる場合のみ維持すれば足ります。'):
         run_ro_dr_builder()
         return
 
@@ -1534,7 +1534,7 @@ def main():
     result_text = '\n'.join(lines)
 
     # 店舗数が十分(270以上)なら、次回①のデフォルト候補として記憶する。
-    # 248店舗版のような店舗数が少ないファイルは記憶を更新しない
+    # partial location list版のような店舗数が少ないファイルは記憶を更新しない
     # (取り違えた古いファイルが「正」として定着してしまうのを防ぐため)。
     dealer_cnt = report.get('対象店舗数')
     if isinstance(dealer_cnt, int) and dealer_cnt >= 270:

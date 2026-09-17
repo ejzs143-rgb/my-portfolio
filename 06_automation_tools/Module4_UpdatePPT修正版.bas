@@ -13,12 +13,12 @@
 '   ...以降14おきに次の行
 '
 ' P8（Slide8）：
-'   「Audi ○○○○」を含むテキストボックスを店舗名に置換
+'   「ExampleBrand B ○○○○」を含むテキストボックスを店舗名に置換
 '   テーブルオブジェクトは存在しないため、「1910 発生件数」「発生月」を
 '   含むテキストボックスを直接書き換える
 '
 ' P10（Slide10）：
-'   「Audi ○○○○」と「重大エラー発生件数：　　　件」（全角スペース3つ）を置換
+'   「ExampleBrand B ○○○○」と「重大エラー発生件数：　　　件」（全角スペース3つ）を置換
 '==============================================================================
 
 '------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ End Sub
 '------------------------------------------------------------------------------
 ' P8更新：店舗個別サマリー（Slide 8）
 ' テーブルなし。テキストボックスを直接書き換える。
-' 「Audi ○○○○」→ 店舗名
+' 「ExampleBrand B ○○○○」→ 店舗名
 ' 「1910 発生件数」の次の行のテキストボックスに件数を入れる
 ' ※P8はテーブルではなくテキストボックスで構成されているため
 '   シェイプのテキストを直接書き換える
@@ -272,8 +272,8 @@ Private Sub UpdateP8_M4(pptPres As Object, sd As Object, shopName As String)
                 txt = sh.TextFrame.TextRange.Text
 
                 ' 店舗名置換
-                If InStr(txt, "Audi ○○○○") > 0 Then
-                    sh.TextFrame.TextRange.Text = Replace(txt, "Audi ○○○○", shopName)
+                If InStr(txt, "ExampleBrand B ○○○○") > 0 Then
+                    sh.TextFrame.TextRange.Text = Replace(txt, "ExampleBrand B ○○○○", shopName)
                     txt = sh.TextFrame.TextRange.Text
                 End If
 
@@ -376,7 +376,7 @@ End Sub
 
 '------------------------------------------------------------------------------
 ' P10更新：発生コード確認（Slide 10）
-' 「Audi ○○○○」と「重大エラー発生件数：　　　件」を置換
+' 「ExampleBrand B ○○○○」と「重大エラー発生件数：　　　件」を置換
 ' ※全角スペース3つ（Chr(12288) x 3）に注意
 '------------------------------------------------------------------------------
 Private Sub UpdateP10_M4(pptPres As Object, sd As Object, shopName As String)
@@ -409,9 +409,9 @@ Private Sub UpdateP10_M4(pptPres As Object, sd As Object, shopName As String)
                 txt = sh.TextFrame.TextRange.Text
 
                 ' 店舗名置換
-                If InStr(txt, "Audi " & ChrW(12288) & ChrW(12288) & ChrW(12288) & ChrW(12288)) > 0 Or _
-                   InStr(txt, "Audi ○○○○") > 0 Then
-                    txt = Replace(txt, "Audi ○○○○", shopName)
+                If InStr(txt, "ExampleBrand B " & ChrW(12288) & ChrW(12288) & ChrW(12288) & ChrW(12288)) > 0 Or _
+                   InStr(txt, "ExampleBrand B ○○○○") > 0 Then
+                    txt = Replace(txt, "ExampleBrand B ○○○○", shopName)
                     sh.TextFrame.TextRange.Text = txt
                 End If
 

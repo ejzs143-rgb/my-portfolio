@@ -1,6 +1,6 @@
 ﻿# =============================================================
-# SupportDesk 返信ドラフト自動生成ツール  v3.3 (徹底精査モード)
-# Example Company 保証課
+# ServiceDesk 返信ドラフト自動生成ツール  v3.3 (徹底精査モード)
+# Example Company Operations Team
 # =============================================================
 
 import os, re, json, hashlib, datetime, sys, queue, threading, time
@@ -18,10 +18,10 @@ from google import genai
 # =============================================================
 
 GEMINI_API_KEY  = os.environ.get("GEMINI_API_KEY", "")
-PDF_FOLDER      = r"C:\Users\Public\Desktop\SupportDesk\マニュアル"
-OUTPUT_FOLDER   = r"C:\Users\Public\Desktop\SupportDesk\Drafts"
-CACHE_FOLDER    = r"C:\Users\Public\Desktop\SupportDesk\cache"
-SupportDesk_FOLDER_NAME = "SupportDesk"
+PDF_FOLDER      = r"C:\Users\Public\Desktop\ServiceDesk\マニュアル"
+OUTPUT_FOLDER   = r"C:\Users\Public\Desktop\ServiceDesk\Drafts"
+CACHE_FOLDER    = r"C:\Users\Public\Desktop\ServiceDesk\cache"
+ServiceDesk_FOLDER_NAME = "ServiceDesk"
 
 MY_ADDRESS      = "user@example.com"
 PAST_MAIL_DAYS  = 730
@@ -51,7 +51,7 @@ def log(msg):
 def ask_datetime_range_gui(root):
     result = {"start": None, "end": None, "ok": False}
     win    = tk.Toplevel(root)
-    win.title("SupportDesk ドラフト生成ツール v3.3")
+    win.title("ServiceDesk ドラフト生成ツール v3.3")
     win.resizable(False, False)
     win.grab_set()
 
@@ -63,8 +63,8 @@ def ask_datetime_range_gui(root):
 
     hdr = tk.Frame(win, bg=ACCENT, padx=16, pady=10)
     hdr.pack(fill="x")
-    tk.Label(hdr, text="SupportDesk 返信ドラフト自動生成ツール", bg=ACCENT, fg="white", font=("Meiryo UI", 13, "bold")).pack(anchor="w")
-    tk.Label(hdr, text="Example Company  保証課", bg=ACCENT, fg="#cde4f7", font=FONT_S).pack(anchor="w")
+    tk.Label(hdr, text="ServiceDesk 返信ドラフト自動生成ツール", bg=ACCENT, fg="white", font=("Meiryo UI", 13, "bold")).pack(anchor="w")
+    tk.Label(hdr, text="Example Company  Operations Team", bg=ACCENT, fg="#cde4f7", font=FONT_S).pack(anchor="w")
 
     body = tk.Frame(win, bg=BG, padx=20, pady=14)
     body.pack(fill="both")
@@ -121,7 +121,7 @@ def ask_datetime_range_gui(root):
 # GUI: リアルタイムログウィンドウ
 # =============================================================
 
-def show_log_window(root, title="SupportDesk 処理中..."):
+def show_log_window(root, title="ServiceDesk 処理中..."):
     win = tk.Toplevel(root)
     win.title(title)
     win.geometry("700x450")
@@ -134,7 +134,7 @@ def show_log_window(root, title="SupportDesk 処理中..."):
 
     hdr = tk.Frame(win, bg=ACCENT, padx=12, pady=8)
     hdr.pack(fill="x")
-    tk.Label(hdr, text="SupportDesk 処理ログ", bg=ACCENT, fg="white", font=FONT_H).pack(side="left")
+    tk.Label(hdr, text="ServiceDesk 処理ログ", bg=ACCENT, fg="white", font=FONT_H).pack(side="left")
     status_var = tk.StringVar(value="● 処理中...")
     status_lbl = tk.Label(hdr, textvariable=status_var, bg=ACCENT, fg="#ffe066", font=FONT_H)
     status_lbl.pack(side="right")
@@ -328,7 +328,7 @@ def connect_outlook():
 
 def find_whd_folder(inbox):
     for folder in inbox.Folders:
-        if folder.Name == SupportDesk_FOLDER_NAME: return folder
+        if folder.Name == ServiceDesk_FOLDER_NAME: return folder
     return None
 
 def normalize_dt(dt):
@@ -386,7 +386,7 @@ def search_similar_mails_from_cache(mail_index, subject):
 def build_prompt(mail, past_mails, manuals, firstname):
     # 【変更】プロンプトを徹底精査モードに強化
     lines = [
-        "あなたはExample Company保証課の経験豊富なSupportDesk担当者です。",
+        "あなたはExample CompanyOperations Teamの経験豊富なServiceDesk担当者です。",
         "以下の【参照マニュアル】の規程内容を隅々まで徹底的に精査し、【過去類似案件】の対応履歴も踏まえた上で、ディーラー担当者への正確な回答メール本文を作成してください。",
         "※推測での回答は厳禁です。必ずマニュアルの該当ルールに則って論理的に記載してください。",
         "",
@@ -445,7 +445,7 @@ def save_draft(mail, draft_text, past_mails, manuals):
     while os.path.exists(path):
         path = os.path.join(OUTPUT_FOLDER, f"{base}_{n}.txt"); n += 1
     header = "\n".join([
-        "=" * 60, "  SupportDesk 返信ドラフト（自動生成）", "=" * 60,
+        "=" * 60, "  ServiceDesk 返信ドラフト（自動生成）", "=" * 60,
         f"生成日時      : {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"対象件名      : {mail.Subject}",
         f"差出人        : {mail.SenderName}",
@@ -496,7 +496,7 @@ def run(start_dt, end_dt, auto_mode=False):
         inbox, sent_box = connect_outlook()
         whd_folder = find_whd_folder(inbox)
         if whd_folder is None:
-            log(f"  [エラー] '{SupportDesk_FOLDER_NAME}' フォルダが見つかりません。")
+            log(f"  [エラー] '{ServiceDesk_FOLDER_NAME}' フォルダが見つかりません。")
             _log_queue.put("__ERROR__")
             return
         log("  → 接続成功")
@@ -555,7 +555,7 @@ def run(start_dt, end_dt, auto_mode=False):
 
 def main():
     print("=" * 60)
-    print("  SupportDesk 返信ドラフト自動生成ツール  v3.3 (徹底精査モード)")
+    print("  ServiceDesk 返信ドラフト自動生成ツール  v3.3 (徹底精査モード)")
     print("=" * 60)
 
     root = tk.Tk()
@@ -564,7 +564,7 @@ def main():
     log("  [手動モード] 日時範囲をGUIで指定してください")
     start_dt, end_dt = ask_datetime_range_gui(root)
 
-    show_log_window(root, "SupportDesk Manual (徹底精査)")
+    show_log_window(root, "ServiceDesk Manual (徹底精査)")
     t = threading.Thread(target=run, args=(start_dt, end_dt, False), daemon=True)
     t.start()
     root.mainloop()

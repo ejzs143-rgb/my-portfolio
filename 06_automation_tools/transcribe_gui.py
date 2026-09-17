@@ -4,15 +4,11 @@ import ssl
 import httpx
 
 # --- 会社のネットワーク（SSL通信）の壁を強制突破する最強のおまじない ---
-os.environ["HF_HUB_DISABLE_SSL_VERIFICATION"] = "1"
-ssl._create_default_https_context = ssl._create_unverified_context
+# SSL verification must remain enabled
+# Do not override the default SSL context
 
 # ダウンロードエンジンのセキュリティチェックを強制的に無効化
-original_init = httpx.Client.__init__
-def patched_init(self, *args, **kwargs):
-    kwargs["verify"] = False
-    original_init(self, *args, **kwargs)
-httpx.Client.__init__ = patched_init
+# Do not monkey-patch HTTP clients to disable certificate verification
 
 warnings.filterwarnings("ignore")
 # -------------------------------------------------------------------

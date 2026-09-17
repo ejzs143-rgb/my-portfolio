@@ -6,7 +6,7 @@
 '   Main_RAWデータ生成：インボイスリスト → RAWデータ.xlsx 生成
 '   Main_PPT自動生成：
 '     ① PPTファイル選択
-'     ② 連絡先リスト選択（Audi販売店AS関連連絡先リスト.xlsx）
+'     ② 連絡先リスト選択（ExampleBrand B販売店AS関連連絡先リスト.xlsx）
 '     ③ RAWデータ選択（またはすでに開いているブックから自動取得）
 '     ④ AM選択（連絡先リストから自動リスト）
 '     ⑤ 店舗選択（AM担当店舗から自動リスト）
@@ -300,7 +300,7 @@ Sub Main_PPT自動生成()
 
     ' STEP2: 連絡先リスト選択
     Set fd = Application.FileDialog(3)
-    fd.Title = "連絡先リスト（Audi販売店AS関連連絡先リスト.xlsx）を選択してください"
+    fd.Title = "連絡先リスト（ExampleBrand B販売店AS関連連絡先リスト.xlsx）を選択してください"
     fd.Filters.Clear
     fd.Filters.Add "Excel", "*.xlsx;*.xlsm"
     fd.AllowMultiSelect = False
@@ -1013,8 +1013,8 @@ Private Sub UpdateP8_M4(pptPres As Object, sd As Object, shopName As String)
     ' Text 1: 店舗名バー
     If shapeDict.Exists(1) Then
         Dim t1 As String: t1 = shapeDict(1).TextFrame.TextRange.Text
-        If InStr(t1, "Audi ○○○○") > 0 Then
-            shapeDict(1).TextFrame.TextRange.Text = Replace(t1, "Audi ○○○○", shopName)
+        If InStr(t1, "ExampleBrand B ○○○○") > 0 Then
+            shapeDict(1).TextFrame.TextRange.Text = Replace(t1, "ExampleBrand B ○○○○", shopName)
         End If
     End If
 
@@ -1072,8 +1072,8 @@ Private Sub UpdateP10_M4(pptPres As Object, sd As Object, shopName As String)
         If sh.HasTextFrame Then
             If sh.TextFrame.HasText Then
                 Dim txt As String: txt = sh.TextFrame.TextRange.Text
-                If InStr(txt, "Audi ○○○○") > 0 Then
-                    sh.TextFrame.TextRange.Text = Replace(txt, "Audi ○○○○", shopName)
+                If InStr(txt, "ExampleBrand B ○○○○") > 0 Then
+                    sh.TextFrame.TextRange.Text = Replace(txt, "ExampleBrand B ○○○○", shopName)
                     txt = sh.TextFrame.TextRange.Text
                 End If
                 If InStr(txt, "重大エラー発生件数：" & zs3 & "件") > 0 Then

@@ -1,0 +1,10 @@
+#!/bin/sh
+# プッシュ前に、送信されるコミット（内容・メッセージ・作成者メール）を leak_guard で検査する
+# 標準入力（プッシュ対象の ref 情報）はそのまま leak_guard に渡る
+ROOT="$(git rev-parse --show-toplevel)"
+PY="$(command -v python || command -v python3 || command -v py)"
+if [ -z "$PY" ]; then
+  echo "[leak-guard] Python が見つからないためプッシュを中止します。" >&2
+  exit 1
+fi
+exec "$PY" "$ROOT/09_leak_guard/leak_guard.py" --pre-push

@@ -1,0 +1,7 @@
+# Windows のバッチ／PowerShell は CRLF で取り出す（LF だと cmd が誤動作する場合がある）
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.bas text eol=crlf
+# Git フックは Git for Windows の sh で動くため LF
+09_leak_guard/hooks/* text eol=lf

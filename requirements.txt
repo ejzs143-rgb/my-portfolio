@@ -1,0 +1,13 @@
+# 共通（データ処理）
+pandas>=2.0
+openpyxl>=3.1
+
+# 06_document_tools
+pypdf>=4.0
+Pillow>=10.0
+pywin32>=306 ; sys_platform == "win32"   # Excel → PDF（Office の COM 連携）
+
+# 07_media_tools
+faster-whisper>=1.0      # transcribe.py
+imageio-ffmpeg>=0.5      # audio_to_wav.py（FFmpeg 同梱版）
+# trim_tool.py / video_compress.py は FFmpeg 本体（PATH 上の ffmpeg）を使用

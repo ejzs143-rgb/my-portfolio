@@ -1,0 +1,24 @@
+# 実行時の生成物
+outputs/
+__pycache__/
+*.pyc
+
+# 業務データ・文書を誤って含めないための除外（leak_guard でも検査）
+inputs/*.xlsx
+inputs/*.xlsm
+inputs/*.csv
+*.xlsx
+*.xlsm
+*.xls
+*.docx
+*.pptx
+*.pdf
+*.msg
+*.eml
+
+# サンプルデータは明示的に許可
+!01_meeting_minutes/inputs/sample.json
+!05_text_grouping/sample_input.csv
+
+# 禁止語リストはリポジトリに入れない
+denylist.txt

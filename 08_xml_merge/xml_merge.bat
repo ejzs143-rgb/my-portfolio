@@ -343,7 +343,8 @@ $btnMerge.Add_Click({
 
             if ($modeIdx -eq 1) {
                 # Mode 2: wrap each file
-                $fname = $fi.Name
+                # ファイル名に & や " が含まれても壊れないよう XML エスケープする
+                $fname = [System.Security.SecurityElement]::Escape($fi.Name)
                 [void]$sb.AppendLine("  <File name=`"$fname`">")
                 [void]$sb.AppendLine('    ' + $doc.DocumentElement.OuterXml)
                 [void]$sb.AppendLine('  </File>')

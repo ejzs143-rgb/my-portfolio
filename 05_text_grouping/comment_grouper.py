@@ -269,6 +269,7 @@ def main():
     with open(input_path, 'r', encoding=enc) as f:
         reader = csv.DictReader(f)
         for row in reader:
+            row.pop(None, None)   # 見出しより列が多い行のはみ出し分は捨てる（出力で列ずれ・空見出しを起こすため）
             rows.append(row)
 
     if not rows:
@@ -310,7 +311,8 @@ def main():
             writer.writerow(sanitized)
     print(f"\n出力完了: {output_path}")
 
-    summary_path = output_path.replace(".csv", "_summary.csv")
+    # 拡張子を差し替える（出力名が .csv 以外だと replace では本体を上書きしてしまうため）
+    summary_path = os.path.splitext(output_path)[0] + "_summary.csv"
     with open(summary_path, 'w', encoding=out_enc, newline='', errors='replace') as f:
         writer = csv.writer(f)
         writer.writerow(["グループ名", "件数", "構成比"])

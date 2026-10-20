@@ -12,7 +12,7 @@ def main():
     # 1. ファイル選択ダイアログ
     file_paths = filedialog.askopenfilenames(
         title="圧縮する画像ファイルを選択してください（複数選択可）",
-        filetypes=[("Image files", "*.jpg;*.jpeg;*.png;*.bmp")]
+        filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp")]
     )
     
     if not file_paths:
@@ -35,8 +35,8 @@ def main():
         try:
             img = Image.open(path)
             
-            # 透過PNG等をJPEG保存可能にするためのRGB変換
-            if img.mode in ("RGBA", "P"):
+            # JPEG で保存できない形式（透過PNG・パレット・16bit 等）は RGB に変換
+            if img.mode not in ("RGB", "L", "CMYK"):
                 img = img.convert("RGB")
             
             _, file_name = os.path.split(path)

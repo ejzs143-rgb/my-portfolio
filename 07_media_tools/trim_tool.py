@@ -4,6 +4,7 @@ import json
 import shutil
 import subprocess
 import tempfile
+import threading
 import tkinter as tk
 from typing import Optional
 
@@ -181,6 +182,11 @@ def run_ffmpeg_with_progress(ffmpeg_path, cmd, segment_seconds, progress_cb):
         bufsize=1
     )
 
+    # stderr を並行して読み捨てずに溜める（読まないとパイプが詰まり、警告の多いファイルで止まるため）
+    err_chunks = []
+    reader = threading.Thread(target=lambda: err_chunks.append(proc.stderr.read()), daemon=True)
+    reader.start()
+
     last_percent = -1
     try:
         if proc.stdout:
@@ -188,7 +194,10 @@ def run_ffmpeg_with_progress(ffmpeg_path, cmd, segment_seconds, progress_cb):
                 line = line.strip()
 
                 if line.startswith("out_time_ms="):
-                    ms = int(line.split("=", 1)[1])
+                    try:
+                        ms = int(line.split("=", 1)[1])
+                    except ValueError:  # 開始直後は "N/A" が来ることがある
+                        continue
                     sec = ms / 1_000_000.0
                     pct = (sec / segment_seconds) * 100.0 if segment_seconds > 0 else 0.0
 
@@ -200,8 +209,9 @@ def run_ffmpeg_with_progress(ffmpeg_path, cmd, segment_seconds, progress_cb):
                     break
 
     finally:
-        stderr = proc.stderr.read() if proc.stderr else ""
         rc = proc.wait()
+        reader.join()
+        stderr = "".join(err_chunks)
 
     if rc != 0:
         raise RuntimeError(stderr.strip() or "ffmpeg failed")
@@ -378,7 +388,7 @@ def main():
     in_file = filedialog.askopenfilename(
         title="Select media file",
         filetypes=[
-            ("Media files", "*.m4a;*.mp4;*.m4v;*.mov;*.mp3;*.aac;*.wav;*.mkv;*.avi"),
+            ("Media files", "*.m4a *.mp4 *.m4v *.mov *.mp3 *.aac *.wav *.mkv *.avi"),
             ("All files", "*.*"),
         ],
     )

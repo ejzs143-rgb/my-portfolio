@@ -1,7 +1,7 @@
 Attribute VB_Name = "Data_Automation_Macro"
 ' ==============================================================================
 ' ツール名: 総合データ転記・集計マクロ (汎用版)
-' 概要: 複数シートからの条件抽出、データクレンジング、およびサマリーシートの自動生成
+' 概要: 全シートのデータ件数を集計したサマリーシートを自動生成
 ' ==============================================================================
 Option Explicit
 
@@ -30,8 +30,8 @@ Sub GenerateSummaryReport()
     wsSummary.Cells(1, 3).Value = "Status"
     targetRow = 2
     
-    ' 各シートのデータを集計
-    For Each ws In wb.Sheets
+    ' 各シートのデータを集計（グラフシートは Worksheet ではないため Worksheets を回す）
+    For Each ws In wb.Worksheets
         If ws.Name <> wsSummary.Name Then
             lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
             

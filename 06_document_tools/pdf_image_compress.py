@@ -1,9 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import filedialog
-from pypdf import PdfReader, PdfWriter
-from PIL import Image
-import io
+from pypdf import PdfWriter
 
 def select_folder(title):
     root = tk.Tk()
@@ -29,30 +27,23 @@ def python_only_compress():
         
         try:
             print(f"処理中: {filename}...")
-            reader = PdfReader(in_path)
-            writer = PdfWriter()
+            writer = PdfWriter(clone_from=in_path)
 
-            for page in reader.pages:
-                writer.add_page(page)
-
-            # 各ページの画像を探して圧縮
+            # 各ページの画像を JPEG（画質30）で置き換える。
+            # pypdf の replace を使うと圧縮形式の情報（/Filter 等）も合わせて書き換わるため、
+            # JPEG 以外（スキャン画像に多い Flate 形式など）も正しく圧縮できる
             for page in writer.pages:
-                if "/Resources" in page and "/XObject" in page["/Resources"]:
-                    xObject = page["/Resources"]["/XObject"].get_object()
-                    for obj in xObject:
-                        if xObject[obj]["/Subtype"] == "/Image":
-                            try:
-                                # 画像を抽出してリサイズ・画質落とし
-                                img_data = xObject[obj].get_data()
-                                img = Image.open(io.BytesIO(img_data))
-                                
-                                # 白黒化せずカラーを維持しつつ圧縮（画質30）
-                                out_img = io.BytesIO()
-                                img.save(out_img, format="JPEG", quality=30)
-                                xObject[obj]._data = out_img.getvalue()
-                            except Exception:
-                                # 抽出できない形式の画像はそのまま残す
-                                continue
+                for image in page.images:
+                    try:
+                        img = image.image
+                        if img.mode in ("RGBA", "LA", "PA"):
+                            continue  # 透過のある画像は JPEG にすると背景が変わるため残す
+                        if img.mode not in ("RGB", "L", "CMYK"):
+                            img = img.convert("RGB")
+                        image.replace(img, quality=30)
+                    except Exception:
+                        # 抽出できない形式の画像はそのまま残す
+                        continue
             
             with open(out_path, "wb") as f:
                 writer.write(f)

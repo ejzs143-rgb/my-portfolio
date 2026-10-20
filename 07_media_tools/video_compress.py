@@ -37,6 +37,7 @@ def run_app():
 
     # --- 4. 圧縮レベルを選択 ---
     level = simpledialog.askstring("圧縮設定", "レベルを選んでください (1:高画質 2:標準 3:低画質 4:最小)", initialvalue="2")
+    if level is None: return  # キャンセル時は実行しない
     crf_map = {"1": "18", "2": "23", "3": "28", "4": "32"}
     crf = crf_map.get(level, "23")
 
